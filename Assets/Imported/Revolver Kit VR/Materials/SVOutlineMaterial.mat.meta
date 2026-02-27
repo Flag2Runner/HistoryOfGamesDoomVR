@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b66d835dd03b2ac42a0143fdccfc493e
+timeCreated: 1507674407
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 103118
+  packageName: Revolver Kit VR - No code needed!
+  packageVersion: 1.0
+  assetPath: Assets/Revolver Kit VR/Materials/SVOutlineMaterial.mat
+  uploadId: 211042

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: bc7f067b9abd5f142a43e62d06064886
+timeCreated: 1508001506
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 103118
+  packageName: Revolver Kit VR - No code needed!
+  packageVersion: 1.0
+  assetPath: Assets/Revolver Kit VR/Prefabs/3D/Materials/bullet_tip.005.mat
+  uploadId: 211042

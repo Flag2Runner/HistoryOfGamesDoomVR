@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: c28e7cc0dc81c3a47aa1d900c30b1c3e
+timeCreated: 1509990694
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 103118
+  packageName: Revolver Kit VR - No code needed!
+  packageVersion: 1.0
+  assetPath: Assets/Revolver Kit VR/Editor/DefinesManager.cs
+  uploadId: 211042

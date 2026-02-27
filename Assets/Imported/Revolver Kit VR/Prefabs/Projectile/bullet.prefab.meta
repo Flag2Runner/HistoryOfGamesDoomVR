@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0349e5f440ec7234c928020441adc5bf
+timeCreated: 1508001635
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 103118
+  packageName: Revolver Kit VR - No code needed!
+  packageVersion: 1.0
+  assetPath: Assets/Revolver Kit VR/Prefabs/Projectile/bullet.prefab
+  uploadId: 211042

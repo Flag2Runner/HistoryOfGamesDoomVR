@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: cdb9db596df9a574b90882279a6fb4a7
+timeCreated: 1523036744
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 115996
+  packageName: Simple VR Teleporter
+  packageVersion: 0.99
+  assetPath: Assets/VRTeleporter/VRTeleporter.cs
+  uploadId: 247407

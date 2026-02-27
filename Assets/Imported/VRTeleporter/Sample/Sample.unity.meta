@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3e3a8057383f08e48af979a491553b4f
+timeCreated: 1523037026
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 115996
+  packageName: Simple VR Teleporter
+  packageVersion: 0.99
+  assetPath: Assets/VRTeleporter/Sample/Sample.unity
+  uploadId: 247407

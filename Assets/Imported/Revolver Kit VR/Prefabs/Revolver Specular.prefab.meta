@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0016527aff1d95144ad9934a87a22768
+timeCreated: 1508703338
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 103118
+  packageName: Revolver Kit VR - No code needed!
+  packageVersion: 1.0
+  assetPath: Assets/Revolver Kit VR/Prefabs/Revolver Specular.prefab
+  uploadId: 211042

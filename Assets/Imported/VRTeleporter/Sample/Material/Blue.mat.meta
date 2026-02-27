@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: dd2b027fa26640342857dd7bfc289ef0
+timeCreated: 1523037058
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 115996
+  packageName: Simple VR Teleporter
+  packageVersion: 0.99
+  assetPath: Assets/VRTeleporter/Sample/Material/Blue.mat
+  uploadId: 247407

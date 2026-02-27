@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2ba4324d6a5c9a949991b6b33bac074e
+timeCreated: 1506912725
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 103118
+  packageName: Revolver Kit VR - No code needed!
+  packageVersion: 1.0
+  assetPath: Assets/Revolver Kit VR/Demo/Scenes/RiftDemo (SteamVR).unity
+  uploadId: 211042
