@@ -90,12 +90,18 @@ namespace Unity.VRTemplate
         [Tooltip("Event called when the value of the lever is changed")]
         public class ValueChangeEvent : UnityEvent<float> { }
 
-        public void CheckValue(float newValue) 
+        public void CheckValue(float newValue)
         {
-            if (newValue >= 0.9f)
+            // If lever is pulled past 90% and we haven't triggered it yet this pull
+            if (newValue >= 0.9f && !m_WasTriggered)
             {
-                //Do thing
-                Debug.Log("Player Has pulled the lever and door is now open");
+                m_WasTriggered = true;
+                Debug.Log("Lever activated! Regenerating Level...");
+
+                if (levelGenerator != null)
+                {
+                   StartCoroutine(levelGenerator.GenerateLevelCoroutine());
+                }
             }
         }
 
@@ -131,6 +137,10 @@ namespace Unity.VRTemplate
         [SerializeField]
         [Tooltip("How much controller rotation")]
         float m_TwistSensitivity = 1.5f;
+
+        [Header("DOOM Level Settings")]
+        public LevelGenerator levelGenerator;
+        [SerializeField] private bool m_WasTriggered = false; // Prevents multiple triggers per pull
 
         [SerializeField]
         [Tooltip("Events to trigger when the knob is rotated")]
@@ -245,6 +255,41 @@ namespace Unity.VRTemplate
         void EndGrab(SelectExitEventArgs args)
         {
             m_Interactor = null;
+
+            // Start a smooth return to the 0.0 position
+            StartCoroutine(ReturnToInitialPosition());
+
+            // Reset the trigger so it can be pulled again
+            m_WasTriggered = false;
+        }
+
+        System.Collections.IEnumerator ReturnToInitialPosition()
+        {
+            float startValue = m_Value;
+            float elapsed = 0f;
+            float duration = 0.5f; // How fast it snaps back
+
+            while (elapsed < duration)
+            {
+                // If the player grabs it again, stop the auto-reset
+                if (isSelected) yield break;
+
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+
+                // Use Lerp to smoothly move from current value back to 0.0
+                float newValue = Mathf.Lerp(startValue, 0.0f, t);
+
+                // Update the visual handle and the internal value
+                m_Value = newValue;
+                SetKnobRotation(ValueToRotation());
+
+                yield return null;
+            }
+
+            // Ensure it's exactly at 0
+            m_Value = 0.0f;
+            SetKnobRotation(ValueToRotation());
         }
 
         /// <inheritdoc />
