@@ -5985,7 +5985,7 @@ MonoBehaviour:
   m_UnlimitedInAirJumps: 0
   m_InAirJumpCount: 1
   m_JumpForgivenessWindow: 0.25
-  m_JumpHeight: 1.25
+  m_JumpHeight: 1.5
   m_VariableHeightJump: 1
   m_MinJumpHoldTime: 0.1
   m_MaxJumpHoldTime: 0.5
@@ -6803,7 +6803,7 @@ MonoBehaviour:
   m_Move: {fileID: -8198699208435500284, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   m_UIScroll: {fileID: -6756787485274679044, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   m_SmoothMotionEnabled: 0
-  m_SmoothTurnEnabled: 0
+  m_SmoothTurnEnabled: 1
   m_NearFarEnableTeleportDuringNearInteraction: 1
   m_UIScrollingEnabled: 1
   m_RayInteractorChanged:
@@ -8978,8 +8978,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Mediator: {fileID: 8869714321379639473}
   m_TransformationPriority: 0
-  m_MoveSpeed: 2.5
-  m_InAirControlModifier: 0.5
+  m_MoveSpeed: 5
+  m_InAirControlModifier: 1
   m_EnableStrafe: 1
   m_EnableFly: 0
   m_ForwardSource: {fileID: 3672823612998365401}
@@ -12479,7 +12479,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7116638278912222958}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9f365cf844c03449bc8973eead2c3c1, type: 3}
   m_Name: 
@@ -12804,7 +12804,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8006056486117718926
 Transform:
   m_ObjectHideFlags: 0

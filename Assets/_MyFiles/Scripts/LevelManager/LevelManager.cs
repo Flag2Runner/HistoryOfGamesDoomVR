@@ -41,6 +41,9 @@ public class LevelGenerator : MonoBehaviour
             // Option A: Make it invisible immediately so the player sees it's gone
             child.gameObject.SetActive(false);
 
+            // THIS IS THE FIX: Instantly remove it from the parent so childCount goes down
+            child.SetParent(null);
+
             // Option B: Rename it so you don't get confused in the hierarchy
             child.name = "DELETING...";
 
@@ -115,29 +118,60 @@ public class LevelGenerator : MonoBehaviour
 
     void CarveDrunkardPath()
     {
-        Vector2Int currentPos = startPos;
+        // 1. The "Spine" (Ensures the level is beatable)
+        // Uses the full maxSteps (e.g., 200) to get from Start to End
+        RunDrunkard(startPos, maxSteps, 0.75f);
 
-        for (int i = 0; i < maxSteps; i++)
+        // 2. The "Chaos Maker" (Builds the maze)
+        // Starts in the middle, but we only give it HALF the steps so it doesn't eat the whole map
+        Vector2Int midPoint = new Vector2Int(gridWidth / 2, gridHeight / 2);
+        RunDrunkard(midPoint, maxSteps / 2, 0.10f);
+
+        // 3. The "Flanker" (Builds side routes)
+        // Starts at a random point, gets HALF the steps
+        Vector2Int randomPoint = new Vector2Int(Random.Range(5, gridWidth - 5), Random.Range(5, gridHeight - 5));
+        while (randomPoint == startPos || randomPoint == endPos)
         {
-            // 1. BIAS MATH: Decide if we move randomly or toward the goal
-            // 60% chance to move toward the End, 40% chance to move purely random
-            bool moveTowardEnd = Random.value < 0.60f;
+            randomPoint = new Vector2Int(Random.Range(5, gridWidth - 5), Random.Range(5, gridHeight - 5));
+        }
+        RunDrunkard(randomPoint, maxSteps / 2, 0.20f);
 
-            if (moveTowardEnd)
+        // 4. CONTROLLED ROOM STAMPING
+        // Always ensure the Start and End rooms are large enough to spawn in
+        StampRoom(startPos);
+        StampRoom(endPos);
+
+        // Explicitly stamp exactly 3 random "Arenas" on the map
+        for (int i = 0; i < 3; i++)
+        {
+            Vector2Int randomArena = new Vector2Int(Random.Range(3, gridWidth - 3), Random.Range(3, gridHeight - 3));
+
+            // EDGE CASE PREVENTION: Check the distance!
+            // If the arena is too close to the Start OR the End, roll the dice again.
+            while (Vector2.Distance(randomArena, startPos) < 5f || Vector2.Distance(randomArena, endPos) < 5f)
             {
-                // Move on X or Y axis toward the target
+                randomArena = new Vector2Int(Random.Range(3, gridWidth - 3), Random.Range(3, gridHeight - 3));
+            }
+
+            StampRoom(randomArena);
+        }
+    }
+
+    void RunDrunkard(Vector2Int start, int steps, float bias)
+    {
+        Vector2Int currentPos = start;
+
+        for (int i = 0; i < steps; i++)
+        {
+            if (Random.value < bias)
+            {
                 if (Random.value < 0.5f && currentPos.x != endPos.x)
-                {
                     currentPos.x += (endPos.x > currentPos.x) ? 1 : -1;
-                }
                 else if (currentPos.y != endPos.y)
-                {
                     currentPos.y += (endPos.y > currentPos.y) ? 1 : -1;
-                }
             }
             else
             {
-                // Pure random movement (your original code)
                 int rand = Random.Range(0, 4);
                 if (rand == 0) currentPos.y += 1;
                 else if (rand == 1) currentPos.y -= 1;
@@ -145,68 +179,96 @@ public class LevelGenerator : MonoBehaviour
                 else if (rand == 3) currentPos.x += 1;
             }
 
-            // 2. SAFETY: Keep inside bounds
             currentPos.x = Mathf.Clamp(currentPos.x, 1, gridWidth - 2);
             currentPos.y = Mathf.Clamp(currentPos.y, 1, gridHeight - 2);
 
-            // 3. STAMPING: Use the logic to make a 3x3 room
-            if (grid[currentPos.x, currentPos.y] != Tile.Start && grid[currentPos.x, currentPos.y] != Tile.End)
+            if (grid[currentPos.x, currentPos.y] == Tile.Wall)
             {
-                if (Random.Range(0, 100) < 10)
-                    StampRoom(currentPos);
-                else
-                    grid[currentPos.x, currentPos.y] = Tile.Floor;
+                grid[currentPos.x, currentPos.y] = Tile.Floor;
             }
+
+            // NOTICE: I removed the 1% StampRoom from here! 
+            // All rooms are now handled safely in CarveDrunkardPath.
         }
     }
+
     bool IsLevelPossible()
     {
         // A HashSet is just a list that doesn't allow duplicates—perfect for "Visited" tiles
         HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
         Queue<Vector2Int> checkNext = new Queue<Vector2Int>();
 
+        // Start the flood fill at the Start position
         checkNext.Enqueue(startPos);
+        visited.Add(startPos); // Mark start as visited immediately
+
+        bool foundEnd = false;
 
         while (checkNext.Count > 0)
         {
             Vector2Int current = checkNext.Dequeue();
 
-            // If we found the End, the map is valid!
-            if (current == endPos) return true;
+            // We found the end! BUT we do NOT return true yet. 
+            // We must let the flood fill keep going to map the entire main island.
+            if (current == endPos)
+            {
+                foundEnd = true;
+            }
 
-            if (visited.Contains(current)) continue;
-            visited.Add(current);
-
-            // Check the 4 neighbors (The "Math")
+            // Check the 4 neighbors
             Vector2Int[] neighbors = {
-            current + Vector2Int.up,    // (x, y+1)
-            current + Vector2Int.down,  // (x, y-1)
-            current + Vector2Int.left,  // (x-1, y)
-            current + Vector2Int.right  // (x+1, y)
-        };
+                current + Vector2Int.up,    // (x, y+1)
+                current + Vector2Int.down,  // (x, y-1)
+                current + Vector2Int.left,  // (x-1, y)
+                current + Vector2Int.right  // (x+1, y)
+            };
 
             foreach (Vector2Int neighbor in neighbors)
             {
-                // Only add to the check list if it's within bounds and NOT a Wall
+                // Only add to the check list if it's within bounds
                 if (neighbor.x >= 0 && neighbor.x < gridWidth && neighbor.y >= 0 && neighbor.y < gridHeight)
                 {
+                    // If it's a Floor/Start/End and we haven't visited it yet
                     if (grid[neighbor.x, neighbor.y] != Tile.Wall && !visited.Contains(neighbor))
                     {
+                        visited.Add(neighbor);
                         checkNext.Enqueue(neighbor);
                     }
                 }
             }
         }
 
-        return false; // If the loop finishes and we never hit the End, it's a dead map.
+        // If the flood fill finished and we NEVER saw the End, the map is broken. Restart.
+        if (!foundEnd) return false;
+
+        // --- THE ISLAND CULLER ---
+        // If we made it here, the main path is valid. 
+        // Now we scan the grid and delete any islands that the flood fill couldn't reach!
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                if (grid[x, y] == Tile.Floor)
+                {
+                    // If this floor tile isn't in our 'visited' list, it's an isolated island!
+                    if (!visited.Contains(new Vector2Int(x, y)))
+                    {
+                        grid[x, y] = Tile.Wall; // Erase it!
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     //Fixes Deadends
     void CreateLoops()
     {
-        for (int x = 1; x < gridWidth - 1; x++)
+        // Start at 2 to avoid breaking the outer boundary walls
+        for (int x = 2; x < gridWidth - 2; x++)
         {
-            for (int y = 1; y < gridHeight - 1; y++)
+            for (int y = 2; y < gridHeight - 2; y++)
             {
                 if (grid[x, y] == Tile.Floor)
                 {
@@ -216,17 +278,21 @@ public class LevelGenerator : MonoBehaviour
                     if (grid[x, y + 1] == Tile.Wall) wallCount++;
                     if (grid[x, y - 1] == Tile.Wall) wallCount++;
 
-                    // If 3 sides are walls, it's a dead end!
+                    // If it's a dead end (3 walls surrounding 1 floor)
                     if (wallCount >= 3)
                     {
-                        // "Bust" through one wall to create a loop
-                        // Just turn one neighbor wall into a Floor
-                        grid[x + 1, y] = Tile.Floor;
+                        // Check if breaking a wall connects to another path nearby
+                        // This creates a "loop" instead of just a deeper dead end
+                        if (x + 2 < gridWidth && grid[x + 2, y] == Tile.Floor) grid[x + 1, y] = Tile.Floor;
+                        else if (x - 2 > 0 && grid[x - 2, y] == Tile.Floor) grid[x - 1, y] = Tile.Floor;
+                        else if (y + 2 < gridHeight && grid[x, y + 2] == Tile.Floor) grid[x, y + 1] = Tile.Floor;
+                        else if (y - 2 > 0 && grid[x, y - 2] == Tile.Floor) grid[x, y - 1] = Tile.Floor;
                     }
                 }
             }
         }
     }
+
     void Spawn3DModels()
     {
         for (int x = 0; x < gridWidth; x++)
