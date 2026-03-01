@@ -872,8 +872,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7392257441607445403}
   - component: {fileID: 1847399947231053767}
+  - component: {fileID: 3801694698344929622}
   - component: {fileID: 2169360522655846029}
-  - component: {fileID: 8062369254613391376}
   m_Layer: 0
   m_Name: Revolver 1
   m_TagString: Untagged
@@ -929,6 +929,33 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &3801694698344929622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4886049929688717991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41012fafc3921f0458b863fd2ad8aac2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Pistol
+  damage: 10
+  range: 100
+  firePoint: {fileID: 6546723989013439003}
+  fireRate: 0.5
+  ammoType: 0
+  maxAmmoInMag: 6
+  usesReserveAmmo: 0
+  reloadButton: {fileID: 0}
+  muzzleFlash: {fileID: 4013142355760584011}
+  audioSource: {fileID: 5305769705493712945}
+  fireSound: {fileID: 8300000, guid: 38918687893f74d41932133308b1d2ff, type: 3}
+  emptyClickSound: {fileID: 8300000, guid: 4baf81ed33d3d8b4895b21a516cfd022, type: 3}
+  reloadSound: {fileID: 8300000, guid: 1420d7394388812489e126b0622aafed, type: 3}
+  hapticIntensity: 0.5
+  hapticDuration: 0.1
 --- !u!114 &2169360522655846029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1067,29 +1094,6 @@ MonoBehaviour:
   m_LimitAngularVelocity: 0
   m_MaxLinearVelocityDelta: 10
   m_MaxAngularVelocityDelta: 20
---- !u!114 &8062369254613391376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4886049929688717991}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfa636ad9edf37a4caeb11aa3f3c694a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponBase
-  firePoint: {fileID: 6546723989013439003}
-  fireRate: 0.5
-  maxAmmo: 6
-  reloadButton: {fileID: 0}
-  muzzleFlash: {fileID: 4013142355760584011}
-  audioSource: {fileID: 5305769705493712945}
-  fireSound: {fileID: 8300000, guid: 38918687893f74d41932133308b1d2ff, type: 3}
-  emptyClickSound: {fileID: 8300000, guid: 4baf81ed33d3d8b4895b21a516cfd022, type: 3}
-  reloadSound: {fileID: 8300000, guid: bb6139231e6f2ef4f94dc7bbd1b7daf2, type: 3}
-  hapticIntensity: 0.5
-  hapticDuration: 0.1
 --- !u!1 &5432198056989402972
 GameObject:
   m_ObjectHideFlags: 0
