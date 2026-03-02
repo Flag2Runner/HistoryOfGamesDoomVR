@@ -15,6 +15,11 @@ public class PlayerCharacter : CharacterBase
     // The Player tracks what they are currently holding!
     public WeaponBase activeWeapon;
 
+    [Header("Run Stats")]
+    public int currentScore = 0;
+    public int enemiesKilled = 0;
+    public int itemsPickedUp = 0;
+
     // REMOVED 'override' - It's just a standard Unity Awake now!
     private void Awake()
     {
@@ -27,9 +32,32 @@ public class PlayerCharacter : CharacterBase
     {
         base.Start();
         entityType = EntityType.Player;
-        currentArmor = 50;
+        currentArmor = maxArmor/2;
 
         // Update the UI at the start (Safety check added in case UI hasn't loaded yet)
+        if (PlayerUIManager.Instance != null)
+        {
+            PlayerUIManager.Instance.UpdateHealthArmor(currentHealth, currentArmor);
+        }
+    }
+
+    // Call this when restarting the level!
+    public void ResetStats()
+    {
+        currentScore = 0;
+        enemiesKilled = 0;
+        itemsPickedUp = 0;
+
+        // Reset Health and Armor
+        currentHealth = maxHealth;
+        currentArmor = maxArmor/2;
+
+        //AMMO RESET
+        reserveBullets = 50;
+        reserveShells = 10;
+        reserveRockets = 0;
+        reserveCells = 0;
+
         if (PlayerUIManager.Instance != null)
         {
             PlayerUIManager.Instance.UpdateHealthArmor(currentHealth, currentArmor);
@@ -95,10 +123,14 @@ public class PlayerCharacter : CharacterBase
         Debug.Log("PLAYER HAS DIED! GAME OVER!");
         onDeath?.Invoke();
 
-        // Reset stats for now so you aren't stuck dead
-        currentHealth = maxHealth;
-        currentArmor = 0;
+        // 1. Tell the UI Manager to pop up the Game Over screen and freeze time
+        if (PlayerUIManager.Instance != null)
+        {
+            PlayerUIManager.Instance.ShowGameOver();
+        }
 
+        // 2. Ensure health doesn't drop into the negatives visually
+        currentHealth = 0;
         if (PlayerUIManager.Instance != null)
         {
             PlayerUIManager.Instance.UpdateHealthArmor(currentHealth, currentArmor);
@@ -124,5 +156,17 @@ public class PlayerCharacter : CharacterBase
         {
             PlayerUIManager.Instance.UpdateHealthArmor(currentHealth, currentArmor);
         }
+    }
+    public override void TakeDamage(int damageAmount)
+    {
+        base.TakeDamage(damageAmount); // The base script calculates the armor/health math
+
+        // Force the UI smartwatch to update!
+        if (PlayerUIManager.Instance != null)
+        {
+            PlayerUIManager.Instance.UpdateHealthArmor(currentHealth, currentArmor);
+            PlayerUIManager.Instance.TriggerDamageFlash();
+        }
+
     }
 }

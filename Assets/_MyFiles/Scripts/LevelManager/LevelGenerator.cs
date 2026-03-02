@@ -1,6 +1,24 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+// Struct for Items
+[System.Serializable]
+public struct LootDrop
+{
+    public GameObject itemPrefab;
+    [Tooltip("Higher number = more common. Example: Medkit = 50, Soulsphere = 2")]
+    public int spawnWeight;
+}
+
+// Struct for Enemies
+[System.Serializable]
+public struct EnemySpawn
+{
+    public GameObject enemyPrefab;
+    [Tooltip("Higher number = more common. Example: Target Cube = 50, Pinky = 10")]
+    public int spawnWeight;
+}
+
 public class LevelGenerator : MonoBehaviour
 {
     // Using an Enum makes our grid much easier to read than just numbers
@@ -19,18 +37,37 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] private Tile[,] grid;
 
     [Header("Prefabs")]
-    [SerializeField] private GameObject floorPrefab;
+    [SerializeField] private GameObject floorPrefab; 
     [SerializeField] private GameObject wallPrefab;
     [SerializeField] private float tileSize = 10f; // Each tile is 10 units wide
 
+    [Header("Level Population (Enemies & Items)")]
+    public GameObject endPedestalPrefab;
+
+    public EnemySpawn[] enemySpawns;
+
+    public LootDrop[] itemPickups;
+
+    [Range(0f, 1f)] public float targetSpawnChance = 0.20f;
+    [Range(0f, 1f)] public float itemSpawnChance = 0.20f;
+
+    public static LevelGenerator Instance { get; private set; }
+
+    void Awake()
+    {
+        // 2. SET UP THE SINGLETON
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
     void Start()
     {
+        Time.timeScale = 1f;
         // Kick off the generation when the game starts
         StartCoroutine(GenerateLevelCoroutine());
     }
     public System.Collections.IEnumerator GenerateLevelCoroutine()
     {
-       
+
         // 0. CLEANUP: Delete all existing walls and floors before building new ones
         // We use a while loop because destroying objects while looping through them 
         // with 'foreach' can sometimes skip items.
@@ -86,19 +123,54 @@ public class LevelGenerator : MonoBehaviour
         if (levelIsFinished)
         {
             Spawn3DModels();
+            PopulateLevel();
             Debug.Log($"Map successful on attempt {attempts}");
 
             GameObject vrRig = GameObject.FindWithTag("Player");
             if (vrRig != null)
             {
-                // tileSize should be the size of your floor prefabs (e.g., 4 or 10)
+                // Teleport the player to the center of the Start Room
                 Vector3 spawnPos = transform.position + new Vector3(startPos.x * tileSize, 1.0f, startPos.y * tileSize);
                 vrRig.transform.position = spawnPos;
+
+                // --- FORCE RESET ALL WEAPONS ---
+                GameObject[] allWeapons = GameObject.FindGameObjectsWithTag("Weapon");
+
+                // Put them a bit higher (1.0f on the Y) so they fall nicely to the floor/table
+                Vector3 weaponSpawnPos = spawnPos + new Vector3(0, 1.0f, 1.0f);
+
+                foreach (GameObject weapon in allWeapons)
+                {
+                    // 1. REFILL THE MAGAZINE
+                    WeaponBase gun = weapon.GetComponent<WeaponBase>();
+                    if (gun != null)
+                    {
+                        gun.currentAmmoInMag = gun.maxAmmoInMag;
+                    }
+
+                    // 2. FORCE DROP AND TELEPORT
+                    // Turning the object off forces all VR Hands and Sockets to immediately let go!
+                    weapon.SetActive(false);
+
+                    // Move it to the start room and reset its rotation so it lays flat
+                    weapon.transform.position = weaponSpawnPos;
+                    weapon.transform.rotation = Quaternion.identity;
+
+                    // Kill any physics momentum so it doesn't go flying when it turns back on
+                    Rigidbody rb = weapon.GetComponent<Rigidbody>();
+                    if (rb != null)
+                    {
+                        rb.linearVelocity = Vector3.zero;
+                        rb.angularVelocity = Vector3.zero;
+                    }
+
+                    // Turn it back on so the player can pick it up!
+                    weapon.SetActive(true);
+
+                    // Move the spawn point to the right so the next gun doesn't spawn inside this one
+                    weaponSpawnPos.x += 0.5f;
+                }
             }
-        }
-        else
-        {
-            Debug.LogError("FAILED: Max attempts reached without finding a path.");
         }
     }
 
@@ -361,5 +433,121 @@ public class LevelGenerator : MonoBehaviour
                 }
             }
         }
+    }
+    void PopulateLevel()
+    {
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                // Calculate the exact 3D center of the tile. 
+                // Y is bumped up slightly so objects don't spawn stuck in the floor.
+                Vector3 spawnPos = new Vector3(x * tileSize, 1.0f, y * tileSize);
+
+                // 1. SPAWN THE EXIT LEVER
+                if (grid[x, y] == Tile.End)
+                {
+                    if (endPedestalPrefab != null)
+                    {
+                        Instantiate(endPedestalPrefab, spawnPos, Quaternion.identity, this.transform);
+                    }
+                }
+                // 2. SPAWN ENEMIES AND ITEMS
+                else if (grid[x, y] == Tile.Floor)
+                {
+                    // Safety check: Don't spawn enemies right on top of the Start Room!
+                    if (Vector2.Distance(new Vector2(x, y), startPos) < 4f) continue;
+
+                    // Roll the dice for an Enemy
+                    if (Random.value < targetSpawnChance && enemySpawns.Length > 0)
+                    {
+                        // USE THE NEW HELPER HERE!
+                        GameObject randomEnemy = GetRandomEnemy();
+
+                        if (randomEnemy != null)
+                        {
+                            Instantiate(randomEnemy, spawnPos, Quaternion.identity, this.transform);
+                        }
+                    }
+                    // If no enemy spawned, roll the dice for an Item
+                    else if (Random.value < itemSpawnChance && itemPickups.Length > 0)
+                    {
+                        GameObject randomItem = GetRandomLoot();
+
+                        if (randomItem != null)
+                        {
+                            Instantiate(randomItem, spawnPos, Quaternion.identity, this.transform);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    GameObject GetRandomLoot()
+    {
+        if (itemPickups == null || itemPickups.Length == 0) return null;
+
+        // 1. Add up all the weights (tickets)
+        int totalWeight = 0;
+        foreach (LootDrop drop in itemPickups)
+        {
+            totalWeight += drop.spawnWeight;
+        }
+
+        // 2. Pick a random number between 0 and the total
+        int randomTicket = Random.Range(0, totalWeight);
+        int currentWeight = 0;
+
+        // 3. Find out which item holds that winning ticket
+        foreach (LootDrop drop in itemPickups)
+        {
+            currentWeight += drop.spawnWeight;
+            if (randomTicket < currentWeight)
+            {
+                return drop.itemPrefab;
+            }
+        }
+
+        return itemPickups[0].itemPrefab; // Fallback just in case
+    }
+    GameObject GetRandomEnemy()
+    {
+        if (enemySpawns == null || enemySpawns.Length == 0) return null;
+
+        // 1. Add up all the weights (tickets)
+        int totalWeight = 0;
+        foreach (EnemySpawn spawn in enemySpawns)
+        {
+            totalWeight += spawn.spawnWeight;
+        }
+
+        // 2. Pick a random number between 0 and the total
+        int randomTicket = Random.Range(0, totalWeight);
+        int currentWeight = 0;
+
+        // 3. Find out which enemy holds that winning ticket
+        foreach (EnemySpawn spawn in enemySpawns)
+        {
+            currentWeight += spawn.spawnWeight;
+            if (randomTicket < currentWeight)
+            {
+                return spawn.enemyPrefab;
+            }
+        }
+
+        return enemySpawns[0].enemyPrefab; // Fallback
+    }
+
+    public void LevelComplete()
+    {
+        Debug.Log("YOU ESCAPED! YOU WIN!");
+
+        // MVP FAST RESTART: Let's instantly wipe and rebuild the map!
+        // We stop the current coroutine just in case it was somehow still running
+        StopAllCoroutines();
+
+        // Start a brand new map generation
+        StartCoroutine(GenerateLevelCoroutine());
     }
 }

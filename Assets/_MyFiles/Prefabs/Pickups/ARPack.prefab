@@ -46,11 +46,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc4d53a2749c6ea4986e156a0121ffd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
+  scoreValue: 10
   pickupType: 1
   amount: 25
   canOvercharge: 0
   ammoCategory: 0
   pickupSound: {fileID: 8300000, guid: 16fba6d30ed741d4a9fdd6e79ee2f3ac, type: 3}
+  soundVolume: 0.13
   spinSpeed: 90
   bobSpeed: 2
   bobHeight: 0.2

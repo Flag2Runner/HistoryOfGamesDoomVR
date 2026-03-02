@@ -61,6 +61,7 @@
     <Analyzer Include="D:\Unity\Installs\6000.3.5f2\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_MyFiles\Scripts\ExitLever\ExitLever.cs" />
     <Compile Include="Assets\VRTemplateAssets\Scripts\VideoPlayerRenderTexture.cs" />
     <Compile Include="Assets\VRTemplateAssets\Scripts\Rotator.cs" />
     <Compile Include="Assets\VRTemplateAssets\Scripts\XRKnob.cs" />
@@ -72,15 +73,20 @@
     <Compile Include="Assets\_MyFiles\Scripts\WeaponBase\Pistol\Pistol.cs" />
     <Compile Include="Assets\VRTemplateAssets\Scripts\BezierCurve.cs" />
     <Compile Include="Assets\VRTemplateAssets\Scripts\LaunchProjectile.cs" />
+    <Compile Include="Assets\_MyFiles\Scripts\LevelManager\LevelGenerator.cs" />
     <Compile Include="Assets\VRTemplateAssets\Scripts\HandSubsystemManager.cs" />
     <Compile Include="Assets\Imported\VRTeleporter\Sample\SampleVRTeleporterController.cs" />
+    <Compile Include="Assets\_MyFiles\Scripts\UI\Win\WinScreenUI.cs" />
+    <Compile Include="Assets\_MyFiles\Scripts\CharacterBase\EnemyCharacter\Pinky\PinkyAI.cs" />
+    <Compile Include="Assets\_MyFiles\Scripts\VRBelt\VRBeltTracking.cs" />
+    <Compile Include="Assets\_MyFiles\Scripts\CharacterBase\EnemyCharacter\EnemyCharacter.cs" />
     <Compile Include="Assets\Imported\VRTeleporter\VRTeleporter.cs" />
     <Compile Include="Assets\_MyFiles\Scripts\ItemPickup\ItemPickup.cs" />
     <Compile Include="Assets\VRTemplateAssets\Scripts\DestroyObject.cs" />
     <Compile Include="Assets\VRTemplateAssets\Scripts\VideoTimeScrubControl.cs" />
+    <Compile Include="Assets\_MyFiles\Scripts\UI\MainMenu\MainMenuController.cs" />
     <Compile Include="Assets\_MyFiles\Scripts\WeaponBase\Shotgun\Shotgun.cs" />
     <Compile Include="Assets\VRTemplateAssets\Scripts\Callout.cs" />
-    <Compile Include="Assets\_MyFiles\Scripts\LevelManager\LevelManager.cs" />
     <Compile Include="Assets\VRTemplateAssets\Scripts\XRLever.cs" />
     <Compile Include="Assets\VRTemplateAssets\Scripts\CalloutGazeController.cs" />
     <Compile Include="Assets\_MyFiles\Scripts\PlayerUIManager\PlayerUIManager.cs" />

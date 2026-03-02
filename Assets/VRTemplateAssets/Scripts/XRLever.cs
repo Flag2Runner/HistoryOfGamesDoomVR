@@ -90,18 +90,19 @@ namespace Unity.VRTemplate
         [Tooltip("Event called when the value of the lever is changed")]
         public class ValueChangeEvent : UnityEvent<float> { }
 
+        [Serializable]
+        [Tooltip("Event called when the value of the lever Over the valuse threashold")]
+        public class ThreashHoldReachedEvent : UnityEvent<bool> { }
+
         public void CheckValue(float newValue)
         {
             // If lever is pulled past 90% and we haven't triggered it yet this pull
             if (newValue >= 0.9f && !m_WasTriggered)
             {
                 m_WasTriggered = true;
-                Debug.Log("Lever activated! Regenerating Level...");
+                Debug.Log("Lever activated!");
 
-                if (levelGenerator != null)
-                {
-                   StartCoroutine(levelGenerator.GenerateLevelCoroutine());
-                }
+               m_OnthreashHoldReached.Invoke(true);
             }
         }
 
@@ -138,13 +139,16 @@ namespace Unity.VRTemplate
         [Tooltip("How much controller rotation")]
         float m_TwistSensitivity = 1.5f;
 
-        [Header("DOOM Level Settings")]
-        public LevelGenerator levelGenerator;
+        [Header("Lever Settings")]
         [SerializeField] private bool m_WasTriggered = false; // Prevents multiple triggers per pull
 
         [SerializeField]
         [Tooltip("Events to trigger when the knob is rotated")]
         ValueChangeEvent m_OnValueChange = new ValueChangeEvent();
+
+        [SerializeField]
+        [Tooltip("Events to trigger when the Threashold is reached")]
+        ThreashHoldReachedEvent m_OnthreashHoldReached = new ThreashHoldReachedEvent();
 
         IXRSelectInteractor m_Interactor;
 

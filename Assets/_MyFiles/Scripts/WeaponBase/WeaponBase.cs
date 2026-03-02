@@ -23,7 +23,7 @@ public class WeaponBase : MonoBehaviour
     [Header("Ammo System")]
     public AmmoType ammoType = AmmoType.Bullets;
     public int maxAmmoInMag = 6;
-    protected int currentAmmoInMag;
+    public int currentAmmoInMag;
 
     [Tooltip("If false, this gun has infinite reserve ammo (like the Pistol or Enemy weapons)")]
     public bool usesReserveAmmo = true;

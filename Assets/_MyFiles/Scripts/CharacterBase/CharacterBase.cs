@@ -65,7 +65,7 @@ public class CharacterBase : MonoBehaviour
         Debug.Log($"{gameObject.name} was killed!");
         onDeath?.Invoke();
 
-        // Base behavior for enemies/props is to disappear
+        // Base behavior is just to disappear. No scoring logic here!
         Destroy(gameObject);
     }
 

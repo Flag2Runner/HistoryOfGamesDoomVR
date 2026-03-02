@@ -5,6 +5,12 @@ public class PlayerUIManager : MonoBehaviour
 {
     public static PlayerUIManager Instance { get; private set; }
 
+    [Header("Damage Flash Settings")]
+    public UnityEngine.UI.Image damageFlashImage;
+    public float flashDuration = 0.5f;
+    [Tooltip("How dark the red gets. 0.35 is safe for VR.")]
+    public float maxAlpha = 0.35f;
+
     [Header("Controller Anchors")]
     public Transform leftHandAnchor;
     public Transform rightHandAnchor;
@@ -17,6 +23,9 @@ public class PlayerUIManager : MonoBehaviour
     [Header("Ammo UI")]
     public Transform ammoCanvas;
     public TextMeshProUGUI ammoText;
+
+    [Header("Game Over Screen")]
+    public GameObject gameOverCanvas;
 
     private void Awake()
     {
@@ -79,5 +88,66 @@ public class PlayerUIManager : MonoBehaviour
         string typeString = isInfinite ? "Infinite" : ammoType.ToString();
 
         ammoText.text = $"{typeString}: {loaded} / {reserveString}";
+    }
+
+    public void TriggerDamageFlash()
+    {
+        if (damageFlashImage != null)
+        {
+            // Stop any flashes currently happening so they don't fight each other
+            StopAllCoroutines();
+            StartCoroutine(FlashRoutine());
+        }
+    }
+    private System.Collections.IEnumerator FlashRoutine()
+    {
+        // 1. Instantly spike the red color to 35% opacity
+        Color flashColor = damageFlashImage.color;
+        flashColor.a = maxAlpha;
+        damageFlashImage.color = flashColor;
+
+        // 2. Smoothly fade it back to 0% over time
+        float timer = 0f;
+        while (timer < flashDuration)
+        {
+            timer += Time.deltaTime;
+            // Mathf.Lerp smoothly blends between the max alpha and zero based on time
+            flashColor.a = Mathf.Lerp(maxAlpha, 0f, timer / flashDuration);
+            damageFlashImage.color = flashColor;
+
+            yield return null; // Wait for the next frame
+        }
+
+        // 3. Ensure it's perfectly invisible when done
+        flashColor.a = 0f;
+        damageFlashImage.color = flashColor;
+    }
+
+    // Call this when the player dies
+    public void ShowGameOver()
+    {
+        if (gameOverCanvas != null)
+        {
+            gameOverCanvas.SetActive(true);
+
+            // 1. Find the VR Headset
+            if (Camera.main != null)
+            {
+                Transform head = Camera.main.transform;
+
+                // 2. Teleport the canvas exactly 2 meters in front of the player's face
+                // We lock the Y axis so the menu doesn't spawn tilted into the ceiling/floor if they are looking up/down
+                Vector3 spawnPos = head.position + (head.forward * 2.0f);
+                spawnPos.y = head.position.y;
+                gameOverCanvas.transform.position = spawnPos;
+
+                // 3. Make the canvas look at the player, then flip it 180 degrees so the text isn't backward!
+                gameOverCanvas.transform.LookAt(head);
+                gameOverCanvas.transform.Rotate(0, 180, 0);
+            }
+
+            // 4. Freeze time so Pinky stops attacking you while you try to click Restart!
+            Time.timeScale = 0f;
+        }
     }
 }

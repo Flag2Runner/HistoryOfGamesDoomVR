@@ -4,6 +4,9 @@ public class ItemPickup : MonoBehaviour
 {
     public enum PickupType { Health, Armor, Ammo }
 
+    [Tooltip("How many points the player gets for finding this")]
+    public int scoreValue = 25;
+
     [Header("Pickup Settings")]
     public PickupType pickupType = PickupType.Health;
     public int amount = 25;
@@ -46,15 +49,24 @@ public class ItemPickup : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Prevent double-triggering if the player has multiple colliders on their body
         if (isCollected) return;
 
-        // Check if the thing that touched us is the Player
-        // We use GetComponentInParent because the collider might be on a child object of the XR Origin
         PlayerCharacter player = other.GetComponentInParent<PlayerCharacter>();
 
         if (player != null)
         {
+            isCollected = true; // Lock it
+
+            // 1. TRACK THE STATS HERE!
+            player.itemsPickedUp++;
+            player.currentScore += scoreValue;
+
+            if (pickupSound != null)
+            {
+                AudioSource.PlayClipAtPoint(pickupSound, transform.position, soundVolume);
+            }
+
+          
             isCollected = true; // Lock it so it only applies once
 
             // Play sound at this location with our custom volume!
